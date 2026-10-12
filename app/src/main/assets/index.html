@@ -34,7 +34,10 @@ body{background:#000;color:#fff;font-family:Arial,sans-serif;-webkit-tap-highlig
 .movie-card:focus {
   outline: none;
 }
-.movie-card:focus 
+.movie-card:focus .poster-wrapper {
+  outline: 3px solid #e50914 !important;
+  box-shadow: 0 0 16px rgba(229, 9, 20, 0.7);
+}
 .favorite-btn {
   position: absolute;
   top: 6px;
@@ -59,11 +62,6 @@ body{background:#000;color:#fff;font-family:Arial,sans-serif;-webkit-tap-highlig
 }
 .favorite-btn.active {
   color: #e50914 !important;
-}
-
-.poster-wrapper {
-  outline: 3px solid #e50914 !important;
-  box-shadow: 0 0 16px rgba(229, 9, 20, 0.7);
 }
 
 .poster-wrapper {
@@ -213,25 +211,129 @@ body{background:#000;color:#fff;font-family:Arial,sans-serif;-webkit-tap-highlig
   border-radius: 10px;
 }
 
-/* Fallback grid container */
+/* ================= 3-Column Responsive Grid (Matches User Reference Image) ================= */
+.cards-grid-3,
 .movies-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 10px;
-  padding: 10px 14px;
-  justify-content: flex-start;
-  direction: rtl;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 9px;
+  padding: 10px 14px 28px 14px;
+  direction: ltr; /* Arranges items row by row from left to right as requested */
+  box-sizing: border-box;
+  width: 100%;
 }
+
+.cards-grid-3 .movie-card,
 .movies-grid .movie-card {
-  flex: 0 0 calc(33.333% - 7px);
-  width: calc(33.333% - 7px);
-  min-width: 105px;
-  max-width: 140px;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: none !important;
+  direction: rtl !important; /* Arabic card text and badges remain RTL */
+  text-align: right !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
 }
-.movies-grid .poster-wrapper {
-  height: auto;
-  aspect-ratio: 2 / 3;
+
+.cards-grid-3 .movie-card .poster-wrapper,
+.movies-grid .movie-card .poster-wrapper {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2 / 3 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55) !important;
 }
+
+.cards-grid-3 .movie-card:hover .poster-wrapper,
+.movies-grid .movie-card:hover .poster-wrapper {
+  border-color: rgba(229, 9, 20, 0.6) !important;
+  box-shadow: 0 6px 18px rgba(229, 9, 20, 0.35) !important;
+}
+
+.cards-grid-3 .movie-card img.poster,
+.movies-grid .movie-card img.poster {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: 11px !important;
+}
+
+.cards-grid-3 .movie-card h3,
+.movies-grid .movie-card h3 {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  margin: 5px 0 2px 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: right !important;
+  direction: rtl !important;
+  display: block !important;
+  line-height: 1.3 !important;
+}
+
+.cards-grid-3 .movie-card p,
+.movies-grid .movie-card p {
+  font-size: 10px !important;
+  color: #888 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: right !important;
+  direction: rtl !important;
+  line-height: 1.2 !important;
+}
+
+.cards-grid-3 .poster-red-badge,
+.movies-grid .poster-red-badge {
+  font-size: 9.5px !important;
+  padding: 2px 7px !important;
+  bottom: 6px !important;
+  right: 6px !important;
+  border-radius: 7px !important;
+}
+
+.cards-grid-3 .poster-version-badge,
+.movies-grid .poster-version-badge {
+  font-size: 8.5px !important;
+  padding: 1px 5px !important;
+  bottom: 6px !important;
+  left: 6px !important;
+  border-radius: 6px !important;
+}
+
+.cards-grid-3 .favorite-btn,
+.movies-grid .favorite-btn {
+  width: 24px !important;
+  height: 24px !important;
+  top: 5px !important;
+  left: 5px !important;
+  font-size: 11px !important;
+}
+
+/* Light mode support */
+body.light-mode .cards-grid-3 .movie-card h3,
+body.light-mode .movies-grid .movie-card h3 {
+  color: #111827 !important;
+}
+body.light-mode .cards-grid-3 .movie-card p,
+body.light-mode .movies-grid .movie-card p {
+  color: #6b7280 !important;
+}
+body.light-mode .cards-grid-3 .movie-card .poster-wrapper,
+body.light-mode .movies-grid .movie-card .poster-wrapper {
+  background: #f3f4f6 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;height:78px;background:#080808;border-top:1px solid #1a1a1a;display:flex;justify-content:space-around;align-items:center;z-index:40}
 .bottom-nav button{background:none;border:none;color:#555;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:22px;padding:6px 12px;border-radius:10px;border:2px solid transparent;cursor:pointer}
 .bottom-nav button span{font-size:11px}
@@ -802,15 +904,28 @@ body.light-mode .home-card-sub {
 }
 
 .details-top-bar {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  z-index: 100;
   direction: rtl;
+  pointer-events: auto;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.5) 75%, transparent 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-sizing: border-box;
+}
+
+body.light-mode .details-top-bar {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.6) 75%, transparent 100%);
 }
 
 .details-top-actions {
@@ -820,22 +935,24 @@ body.light-mode .home-card-sub {
 }
 
 .details-glass-btn {
-  background: rgba(0, 0, 0, 0.58);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  width: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  min-width: 42px;
   height: 42px;
-  border-radius: 50%;
+  border-radius: 21px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   transition: transform 0.15s ease, background 0.15s ease;
   outline: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .details-glass-btn:active {
@@ -845,6 +962,50 @@ body.light-mode .home-card-sub {
 .details-glass-btn.active-fav svg {
   fill: #e50914 !important;
   stroke: #e50914 !important;
+}
+
+.details-back-btn {
+  width: auto !important;
+  min-width: 92px !important;
+  height: 42px !important;
+  padding: 0 16px !important;
+  border-radius: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  background: rgba(15, 15, 15, 0.88) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+
+.details-back-btn:active {
+  transform: scale(0.94) !important;
+}
+
+body.light-mode .details-glass-btn {
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .details-back-btn {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1.5px solid #d1d5db !important;
+  color: #111827 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Hide global home top bar on dedicated full-screen pages like Details and Episodes */
+body.page-details-active .top-bar,
+body.page-episodes-active .top-bar {
+  display: none !important;
 }
 
 .details-overlap-container {
@@ -4256,6 +4417,10 @@ window.getItemLandscapePoster = function(item) {
 };
 
 window.renderHome = () => {
+  document.body.classList.remove("page-details-active", "page-episodes-active");
+  const globalTopBar = document.querySelector(".top-bar");
+  if (globalTopBar) globalTopBar.style.display = "flex";
+
   if (window.heroSlideTimer) {
     clearInterval(window.heroSlideTimer);
     window.heroSlideTimer = null;
@@ -4438,7 +4603,7 @@ window.renderHome = () => {
       </div>
     </div>
 
-    <!-- 5. Explore All Content Section (Horizontal scrollable rows matching reference image) -->
+    <!-- 5. Explore All Content Section (3-Column Responsive Grid as requested) -->
     <div class="home-section" style="padding-top:6px">
       <div class="home-section-header">
         <div class="home-section-title-wrap">
@@ -4447,14 +4612,9 @@ window.renderHome = () => {
         </div>
         <button type="button" class="home-section-more-btn" onclick="showPage('anime')">عرض المزيد ←</button>
       </div>
-      <div class="cards-scroll-row">
-        ${hourlyItems.slice(0, 15).map(createCard).join("")}
+      <div class="cards-grid-3">
+        ${hourlyItems.map(createCard).join("")}
       </div>
-      ${hourlyItems.length > 15 ? `
-        <div class="cards-scroll-row" style="margin-top:4px">
-          ${hourlyItems.slice(15, 30).map(createCard).join("")}
-        </div>
-      ` : ''}
     </div>
   `;
 
@@ -4496,75 +4656,12 @@ window.renderCategory=(type)=>{
         <button onclick="window.clearFilters('${type}')" style="background:#e50914;color:#fff;border:none;padding:10px 22px;border-radius:20px;font-weight:bold;cursor:pointer">إزالة الفلاتر وعرض الكل</button>
       </div>
     `;
-  } else if (activeFilterCount > 0) {
-    // When filters are active, show filtered results organized in smooth horizontal rows
-    let row1 = items.slice(0, 15);
-    let row2 = items.slice(15, 30);
-    let row3 = items.slice(30);
-    contentGridHtml = `
-      <div class="category-sub-section">
-        <div class="category-sub-header">
-          <div class="category-sub-title-wrap">
-            <span style="font-size:17px">🎯</span>
-            <h3 class="category-sub-title">النتائج المطابقة للتصفية</h3>
-          </div>
-          <span class="category-sub-count">${items.length} عمل</span>
-        </div>
-        <div class="cards-scroll-row">${row1.map(createCard).join("")}</div>
-        ${row2.length > 0 ? `<div class="cards-scroll-row" style="margin-top:6px">${row2.map(createCard).join("")}</div>` : ''}
-        ${row3.length > 0 ? `<div class="cards-scroll-row" style="margin-top:6px">${row3.map(createCard).join("")}</div>` : ''}
-      </div>
-    `;
   } else {
-    // When browsing the category normally, split into organized horizontal rows: Movies, Series, and All
-    let seriesList = items.filter(x => (x.category || "").trim() === "مسلسل");
-    let moviesList = items.filter(x => (x.category || "").trim() === "فلم" || (x.category || "").trim() === "فيلم");
-    let otherList = items.filter(x => (x.category || "").trim() !== "مسلسل" && (x.category || "").trim() !== "فلم" && (x.category || "").trim() !== "فيلم");
-
-    let seriesSectionHtml = seriesList.length > 0 ? `
-      <div class="category-sub-section">
-        <div class="category-sub-header">
-          <div class="category-sub-title-wrap">
-            <span style="font-size:17px">📺</span>
-            <h3 class="category-sub-title">${isAnimation ? 'مسلسلات الأنيميشن' : 'مسلسلات الأنمي'}</h3>
-          </div>
-          <span class="category-sub-count">${seriesList.length} عمل</span>
-        </div>
-        <div class="cards-scroll-row">${seriesList.map(createCard).join("")}</div>
-      </div>
-    ` : '';
-
-    let moviesSectionHtml = moviesList.length > 0 ? `
-      <div class="category-sub-section">
-        <div class="category-sub-header">
-          <div class="category-sub-title-wrap">
-            <span style="font-size:17px">🎬</span>
-            <h3 class="category-sub-title">${isAnimation ? 'أفلام الأنيميشن' : 'أفلام الأنمي'}</h3>
-          </div>
-          <span class="category-sub-count">${moviesList.length} عمل</span>
-        </div>
-        <div class="cards-scroll-row">${moviesList.map(createCard).join("")}</div>
-      </div>
-    ` : '';
-
-    // All / other items section
-    let allRow1 = items.slice(0, 15);
-    let allRow2 = items.slice(15, 30);
-    let allSectionHtml = `
-      <div class="category-sub-section">
-        <div class="category-sub-header">
-          <div class="category-sub-title-wrap">
-            <span style="font-size:17px">✨</span>
-            <h3 class="category-sub-title">${isAnimation ? 'كافة أعمال الأنيميشن' : 'كافة أعمال الأنمي'}</h3>
-          </div>
-          <span class="category-sub-count">${items.length} عمل</span>
-        </div>
-        <div class="cards-scroll-row">${allRow1.map(createCard).join("")}</div>
-        ${allRow2.length > 0 ? `<div class="cards-scroll-row" style="margin-top:6px">${allRow2.map(createCard).join("")}</div>` : ''}
+    contentGridHtml = `
+      <div class="cards-grid-3">
+        ${items.map(createCard).join("")}
       </div>
     `;
-
-    contentGridHtml = seriesSectionHtml + moviesSectionHtml + allSectionHtml;
   }
 
   main.innerHTML=`
@@ -4591,6 +4688,11 @@ window.renderCategory=(type)=>{
 window.navigateTo=(next,renderFn)=>{
   if(currentPage!==next){historyStack.push(currentPage);}
   currentPage=next;
+  if (next !== "details" && next !== "episodes") {
+    document.body.classList.remove("page-details-active", "page-episodes-active");
+    const globalTopBar = document.querySelector(".top-bar");
+    if (globalTopBar) globalTopBar.style.display = "flex";
+  }
   renderFn();
   window.scrollTo(0,0);
 };
@@ -4735,6 +4837,11 @@ window.renderDetailsPage = function(fid) {
   window._lastDetailsFid = fid;
   window.expandedDescriptions[fid] = false;
 
+  document.body.classList.add("page-details-active");
+  document.body.classList.remove("page-episodes-active");
+  const globalTopBar = document.querySelector(".top-bar");
+  if (globalTopBar) globalTopBar.style.display = "none";
+
   let isAnimation = item.type === "animation" || item.type === "arabic" || item.type === "sports";
   let categoryLabel = window.translateCategoryLabel(item.category, isAnimation);
   let isFav = window.isFavorite ? window.isFavorite(item.id) : false;
@@ -4819,13 +4926,14 @@ window.renderDetailsPage = function(fid) {
         <div class="details-hero-overlay-top"></div>
         <div class="details-hero-overlay-bottom"></div>
         
-        <!-- Floating Navigation & Action Bar -->
+        <!-- Floating Navigation & Action Bar with Prominent Back Button -->
         <div class="details-top-bar">
-          <button type="button" class="details-glass-btn" onclick="goBack()" title="رجوع" aria-label="رجوع">
-            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <button type="button" class="details-glass-btn details-back-btn" onclick="goBack()" title="رجوع" aria-label="رجوع">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
+            <span>رجوع</span>
           </button>
           <div class="details-top-actions">
             <button type="button" class="details-glass-btn ${isFav ? 'active-fav' : ''}" onclick="window.toggleDetailsFavorite('${item.id}', '${item.firebaseId}')" title="${isFav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}" aria-label="المفضلة">
@@ -4902,6 +5010,17 @@ window.renderDetailsPage = function(fid) {
               <span class="spec-val">${episodes.length} حلقة</span>
             </div>
           ` : ''}
+        </div>
+
+        <!-- In-card Back Button for quick navigation -->
+        <div style="margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center">
+          <button type="button" class="details-glass-btn details-back-btn" style="margin: 0 auto; display: inline-flex; width: auto; padding: 0 22px" onclick="goBack()">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>← الرجوع للقائمة السابقة</span>
+          </button>
         </div>
       </div>
     </div>
@@ -5103,6 +5222,11 @@ window.renderEpisodesPage = function(fid) {
     return;
   }
   window._lastDetailsFid = fid;
+
+  document.body.classList.add("page-episodes-active");
+  document.body.classList.remove("page-details-active");
+  const globalTopBar = document.querySelector(".top-bar");
+  if (globalTopBar) globalTopBar.style.display = "none";
 
   let baseEpisodes = Array.isArray(item.episodes) ? item.episodes : (item.video || item.altUrl ? [{ title: "الحلقة 1", video: item.video || "", altUrl: item.altUrl || "" }] : []);
   let safeTitle = window.escapeDescHtml(item.title || "");
@@ -5484,6 +5608,11 @@ window.renderFavorites=()=>{
 };
 const CATEGORY_KEYS = ["animation", "anime", "arabic", "foreign"];
 window.showPage=(p)=>{
+  if (p !== "details" && p !== "episodes") {
+    document.body.classList.remove("page-details-active", "page-episodes-active");
+    const globalTopBar = document.querySelector(".top-bar");
+    if (globalTopBar) globalTopBar.style.display = "flex";
+  }
   if(currentPage===p){
     if(p==="home")renderHome();
     else if(CATEGORY_KEYS.includes(p))renderCategory(p);
@@ -5532,6 +5661,11 @@ window.goBack=()=>{
   let prev=historyStack.pop();
   currentPage=prev;
   window.selectEpisodeMode=false;
+  if (prev !== "details" && prev !== "episodes") {
+    document.body.classList.remove("page-details-active", "page-episodes-active");
+    const globalTopBar = document.querySelector(".top-bar");
+    if (globalTopBar) globalTopBar.style.display = "flex";
+  }
   if(prev==="home")renderHome();
   else if(CATEGORY_KEYS.includes(prev))renderCategory(prev);
   else if(prev==="favorites")renderFavorites();
