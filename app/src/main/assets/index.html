@@ -661,8 +661,8 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
   display: none;
 }
 .home-content-card {
-  flex: 0 0 205px;
-  width: 205px;
+  flex: 0 0 135px;
+  width: 135px;
   position: relative;
   cursor: pointer;
   text-align: right;
@@ -670,12 +670,12 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
 }
 .home-card-poster-wrap {
   width: 100%;
-  height: 116px; /* 16:9 Landscape Ratio (205px / 116px ≈ 1.767) */
+  height: 190px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
   background: #141414;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   border: 1px solid #222;
 }
 .home-card-poster-wrap img {
@@ -694,7 +694,7 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
   right: 6px;
   background: rgba(229, 9, 20, 0.92);
   color: #fff;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: bold;
   padding: 3px 8px;
   border-radius: 8px;
@@ -704,7 +704,6 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  z-index: 2;
 }
 .home-card-rank-badge {
   position: absolute;
@@ -719,10 +718,9 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
   display: flex;
   align-items: center;
   gap: 2px;
-  z-index: 2;
 }
 .home-card-title {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: bold;
   color: #fff;
   margin: 6px 0 2px 0;
@@ -731,7 +729,7 @@ body.light-mode .auth-input{background:#f7f8fa;color:#111;border:1.5px solid #cf
   text-overflow: ellipsis;
 }
 .home-card-sub {
-  font-size: 11.5px;
+  font-size: 11px;
   color: #777;
   white-space: nowrap;
   overflow: hidden;
@@ -4306,20 +4304,18 @@ window.renderHome = () => {
     <span class="hero-dot ${idx === 0 ? 'active' : ''}" onclick="event.stopPropagation();window.goToHeroSlide(${idx})"></span>
   `).join("");
 
-  // 2. New Episodes Section (items that have episodes) - Landscape Cards
+  // 2. New Episodes Section (items that have episodes)
   const newEpisodesItems = all.filter(x => Array.isArray(x.episodes) && x.episodes.length > 0).slice(0, 14);
   const newEpisodesCardsHtml = newEpisodesItems.map(item => {
     const lastEpIdx = item.episodes.length - 1;
     const lastEp = item.episodes[lastEpIdx];
-    const epBadge = lastEp ? (lastEp.title || `الحلقة ${lastEpIdx + 1}`) : `الحلقة ${item.episodes.length}`;
+    const epBadge = lastEp ? (lastEp.title || `حلقة ${lastEpIdx + 1}`) : `حلقة ${item.episodes.length}`;
     let isAnimation = item.type === "animation" || item.type === "arabic" || item.type === "sports";
     let catLabel = item.category || (isAnimation ? "أنميشن" : "مسلسل");
-    let landscapeImg = window.getItemLandscapePoster(item);
-    let fallbackImg = (item.poster || "").trim();
     return `
       <div class="home-content-card" onclick="openDetails('${item.firebaseId}')">
         <div class="home-card-poster-wrap">
-          <img src="${landscapeImg}" alt="${window.escapeDescHtml(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}'">
+          <img src="${item.poster}" alt="${window.escapeDescHtml(item.title)}" loading="lazy">
           <span class="home-card-badge">${window.escapeDescHtml(epBadge)}</span>
         </div>
         <div class="home-card-title">${window.escapeDescHtml(item.title)}</div>
@@ -4328,37 +4324,24 @@ window.renderHome = () => {
     `;
   }).join("");
 
-  // 3. Latest Added Content (sorted by creation date newest first) - Landscape Cards
+  // 3. Latest Added Content (sorted by creation date newest first)
   const latestAddedItems = [...all].slice(0, 14);
   const latestAddedCardsHtml = latestAddedItems.map(item => {
     let isAnimation = item.type === "animation" || item.type === "arabic" || item.type === "sports";
     let catLabel = item.category || (isAnimation ? "أنميشن" : "مسلسل");
-    let isMovie = item.category === "فيلم" || item.category === "فلم" || item.type === "movies";
-    let badgeText = "";
-    if (isMovie) {
-      badgeText = "الفيلم";
-    } else if (item.version) {
-      badgeText = item.version;
-    } else if (Array.isArray(item.episodes) && item.episodes.length > 0) {
-      badgeText = `الحلقة ${item.episodes.length}`;
-    } else {
-      badgeText = item.category || `${item.year || 2024}`;
-    }
-    let landscapeImg = window.getItemLandscapePoster(item);
-    let fallbackImg = (item.poster || "").trim();
     return `
       <div class="home-content-card" onclick="openDetails('${item.firebaseId}')">
         <div class="home-card-poster-wrap">
-          <img src="${landscapeImg}" alt="${window.escapeDescHtml(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}'">
-          <span class="home-card-badge">${window.escapeDescHtml(badgeText)}</span>
+          <img src="${item.poster}" alt="${window.escapeDescHtml(item.title)}" loading="lazy">
+          <span class="home-card-badge" style="background:rgba(0,180,240,0.92);color:#000;font-weight:900">${item.year || 2024}</span>
         </div>
         <div class="home-card-title">${window.escapeDescHtml(item.title)}</div>
-        <div class="home-card-sub">${window.escapeDescHtml(catLabel)} • ${item.year || ""}</div>
+        <div class="home-card-sub">${window.escapeDescHtml(catLabel)} ${item.version ? `• ${item.version}` : ''}</div>
       </div>
     `;
   }).join("");
 
-  // 4. Most Watched (sorted by real views/engagement descending) - Landscape Cards
+  // 4. Most Watched (sorted by real views/engagement descending)
   const mostWatchedItems = [...all].sort((a, b) => {
     let va = window.getItemViews(a);
     let vb = window.getItemViews(b);
@@ -4369,8 +4352,6 @@ window.renderHome = () => {
   const mostWatchedCardsHtml = mostWatchedItems.map((item, idx) => {
     let isAnimation = item.type === "animation" || item.type === "arabic" || item.type === "sports";
     let catLabel = item.category || (isAnimation ? "أنميشن" : "مسلسل");
-    let isMovie = item.category === "فيلم" || item.category === "فلم" || item.type === "movies";
-    let badgeText = isMovie ? "الفيلم" : (item.version || (item.episodes?.length ? `الحلقة ${item.episodes.length}` : (item.category || "")));
     let rankBadgeStyle = "";
     let rankText = `#${idx + 1}`;
     if (idx === 0) {
@@ -4386,15 +4367,12 @@ window.renderHome = () => {
       rankBadgeStyle = "background:rgba(20,20,20,0.85);color:#fff;border:1px solid #444";
       rankText = `#${idx + 1}`;
     }
-    let landscapeImg = window.getItemLandscapePoster(item);
-    let fallbackImg = (item.poster || "").trim();
 
     return `
       <div class="home-content-card" onclick="openDetails('${item.firebaseId}')">
         <div class="home-card-poster-wrap">
-          <img src="${landscapeImg}" alt="${window.escapeDescHtml(item.title)}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImg}'">
+          <img src="${item.poster}" alt="${window.escapeDescHtml(item.title)}" loading="lazy">
           <span class="home-card-rank-badge" style="${rankBadgeStyle}">${rankText}</span>
-          ${badgeText ? `<span class="home-card-badge">${window.escapeDescHtml(badgeText)}</span>` : ''}
         </div>
         <div class="home-card-title">${window.escapeDescHtml(item.title)}</div>
         <div class="home-card-sub">${window.escapeDescHtml(catLabel)} • ${item.year || ""}</div>
