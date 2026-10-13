@@ -1284,6 +1284,141 @@ body.page-episodes-active .top-bar {
 .spec-val.status-completed { color: #38bdf8; }
 .spec-val.status-upcoming { color: #fbbf24; }
 
+/* ================= Trailer Card (Reference Design) ================= */
+.details-trailer-card {
+  margin: 0 16px 14px 16px;
+  background: #141414;
+  border: 1px solid #262626;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  direction: rtl;
+  user-select: none;
+  -webkit-user-select: none;
+  text-decoration: none;
+  outline: none;
+}
+
+.details-trailer-card:hover {
+  border-color: rgba(229, 9, 20, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.details-trailer-card:active {
+  transform: scale(0.98);
+}
+
+.details-trailer-text-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.details-trailer-title {
+  font-size: 19px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.details-trailer-thumb-col {
+  position: relative;
+  width: 130px;
+  min-width: 130px;
+  height: 82px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.details-trailer-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.9);
+  transition: transform 0.25s ease;
+}
+
+.details-trailer-card:hover .details-trailer-thumb-img {
+  transform: scale(1.05);
+}
+
+.details-trailer-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.details-trailer-play-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.details-trailer-card:hover .details-trailer-play-icon {
+  transform: scale(1.12);
+  background: #ffffff;
+}
+
+.details-trailer-badge-pill {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  line-height: 1.2;
+}
+
+/* Light mode for trailer card */
+body.light-mode .details-trailer-card {
+  background: #ffffff;
+  border-color: #e2e5ec;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .details-trailer-card:hover {
+  border-color: rgba(229, 9, 20, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .details-trailer-title {
+  color: #111827;
+}
+
 /* ================= Episodes Dedicated Page (Reference Design) ================= */
 .episodes-page-wrapper {
   position: relative;
@@ -2327,6 +2462,10 @@ body.light-mode .details-genre-chip {
         <div>
           <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">رابط البوستر الأفقي (بانوراما في صفحة التفاصيل):</label>
           <input id="editContentBannerInput" class="input" style="margin:0" placeholder="https://... رابط صورة البوستر الأفقي العريض">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">رابط العرض الدعائي (Trailer URL - اختياري):</label>
+          <input id="editContentTrailerInput" class="input" style="margin:0" placeholder="https://... رابط YouTube أو فيديو مباشر للعرض الدعائي">
         </div>
         <div>
           <label style="font-size:12px;color:#aaa;display:block;margin-bottom:4px">حالة العمل:</label>
@@ -4256,6 +4395,7 @@ onSnapshot(q,(s)=>{
       ...data,
       genres: genres,
       version: (data.version || "").trim(),
+      trailerUrl: (data.trailerUrl || data.trailer || "").trim(),
       alternativeTitles: alts
     };
   });
@@ -4718,6 +4858,66 @@ window.normalizeVideoUrl = function(rawUrl) {
   }
   return u;
 };
+
+/* ================= Trailer Helper Functions ================= */
+window.getYouTubeVideoId = function(url) {
+  if (!url || typeof url !== "string") return null;
+  const cleaned = url.trim();
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = cleaned.match(regExp);
+  return (match && match[1]) ? match[1] : null;
+};
+
+window.getTrailerThumbnail = function(trailerUrl, fallbackPoster) {
+  const ytId = window.getYouTubeVideoId(trailerUrl);
+  if (ytId) {
+    return `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+  }
+  return fallbackPoster || "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400";
+};
+
+window.openTrailerVideo = function(fid) {
+  const item = getItemByFirebaseId(fid);
+  if (!item) {
+    alert("تعذّر العثور على العمل المحدد.");
+    return;
+  }
+  const rawTrailer = (item.trailerUrl || item.trailer || "").trim();
+  if (!rawTrailer) {
+    alert("لا يتوفر رابط عرض دعائي مضاف لهذا العمل حالياً.");
+    return;
+  }
+
+  let finalUrl = rawTrailer;
+  if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+    finalUrl = "https://" + finalUrl;
+  }
+
+  // Check if it is a direct playable video stream (.mp4, .m3u8, .mkv, .webm, pixeldrain API)
+  const isDirectVideo = /\.(mp4|m3u8|mkv|webm|ts|mov)(\?.*)?$/i.test(finalUrl) ||
+                        finalUrl.includes("pixeldrain.com/api/file/") ||
+                        finalUrl.includes(".m3u8");
+
+  if (isDirectVideo) {
+    const streamTitle = (item.title ? (item.title + " - العرض الدعائي") : "العرض الدعائي");
+    if (window.AndroidBridge && typeof window.AndroidBridge.playStream === "function") {
+      try {
+        window.AndroidBridge.playStream(finalUrl, streamTitle);
+        return;
+      } catch (err) {
+        console.warn("AndroidBridge playStream error, falling back to browser:", err);
+      }
+    }
+  }
+
+  // YouTube, external video websites, or general web links
+  try {
+    window.openExternalLink(finalUrl);
+  } catch (err) {
+    console.error("Error launching trailer URL:", err);
+    alert("تعذّر فتح رابط العرض الدعائي: " + err.message);
+  }
+};
 window.episodesSortOrder = "asc";
 
 window.renderEpisodesList = function(fid) {
@@ -4914,6 +5114,34 @@ window.renderDetailsPage = function(fid) {
     <span class="details-meta-pill version-pill">${window.escapeDescHtml(item.version)}</span>
   ` : "";
 
+  // Trailer Card (العرض الدعائي) - shown only if trailerUrl exists
+  let trailerRawUrl = (item.trailerUrl || item.trailer || "").trim();
+  let trailerCardHtml = "";
+  if (trailerRawUrl) {
+    let trailerThumb = window.getTrailerThumbnail(trailerRawUrl, posterImg);
+    trailerCardHtml = `
+      <div class="details-trailer-card" onclick="window.openTrailerVideo('${item.firebaseId}')" title="تشغيل العرض الدعائي" role="button" tabindex="0">
+        <div class="details-trailer-thumb-col">
+          <img class="details-trailer-thumb-img" src="${trailerThumb}" alt="العرض الدعائي" loading="lazy" onerror="this.src='${posterImg}'">
+          <div class="details-trailer-thumb-overlay">
+            <div class="details-trailer-play-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="margin-left: 2px">
+                <polygon points="6 4 20 12 6 20 6 4"></polygon>
+              </svg>
+            </div>
+          </div>
+          <span class="details-trailer-badge-pill">TRAILER</span>
+        </div>
+        <div class="details-trailer-text-col">
+          <span class="details-trailer-title">
+            <span>العرض الدعائي</span>
+            <span style="font-size:16px;color:#e50914">🎬</span>
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
   main.innerHTML = `
     <div class="details-page-wrapper">
       <!-- 1. Panoramic Header Section -->
@@ -5019,6 +5247,8 @@ window.renderDetailsPage = function(fid) {
           </button>
         </div>
       </div>
+
+      ${trailerCardHtml}
     </div>
   `;
 };
@@ -5823,6 +6053,7 @@ window.renderAddPage=(isBack=false)=>{
   <div id="addAltTitlesChips" style="display:flex;flex-wrap:wrap;gap:6px;min-height:24px"></div>
 </div><input id="addYear" class="input" type="number" placeholder="السنة"><input id="addPoster" class="input" placeholder="رابط بوستر العمل (العمودي)">
 <input id="addBanner" class="input" placeholder="رابط البوستر الأفقي (بانوراما في صفحة التفاصيل - اختياري)">
+<input id="addTrailer" class="input" placeholder="رابط العرض الدعائي (Trailer URL - اختياري)">
 <select id="addStatus" class="input" style="cursor:pointer">
   <option value="مستمر">حالة العمل: مستمر (Ongoing)</option>
   <option value="مكتمل">حالة العمل: مكتمل (Completed)</option>
@@ -5839,6 +6070,7 @@ window.addNewContent=async()=>{
   if(window.currentUserRole!=="ADMIN"){showPage('home');return;}
   let type=document.getElementById("addType").value,category=(document.getElementById("addCategory")?document.getElementById("addCategory").value.trim():"")||"مسلسل",title=document.getElementById("addTitle").value.trim(),year=document.getElementById("addYear").value||2024,poster=document.getElementById("addPoster").value.trim()||window.tempPosterData,video=document.getElementById("addVideo").value.trim()||window.tempVideoData,altUrl=(document.getElementById("addAltUrl")?document.getElementById("addAltUrl").value.trim():""),desc=document.getElementById("addDesc").value.trim()||"بدون وصف";
   let banner=(document.getElementById("addBanner")?document.getElementById("addBanner").value.trim():"");
+  let trailerUrl=(document.getElementById("addTrailer")?document.getElementById("addTrailer").value.trim():"");
   let status=(document.getElementById("addStatus")?document.getElementById("addStatus").value.trim():"")||"مستمر";
   let version = (document.getElementById("addVersion") ? document.getElementById("addVersion").value.trim() : "") || "";
   let selectedGenres = (window.addFormSelectedGenres || []).map(x => String(x || "").trim()).filter(Boolean);
@@ -5846,6 +6078,9 @@ window.addNewContent=async()=>{
   video = window.normalizeVideoUrl(video);
   if(altUrl && !altUrl.startsWith("http://") && !altUrl.startsWith("https://")){
     altUrl="https://"+altUrl;
+  }
+  if(trailerUrl && !trailerUrl.startsWith("http://") && !trailerUrl.startsWith("https://")){
+    trailerUrl="https://"+trailerUrl;
   }
   // Flush any pending alternative title in the input
   if (document.getElementById("newAltTitleInput") && document.getElementById("newAltTitleInput").value.trim()) {
@@ -5855,7 +6090,7 @@ window.addNewContent=async()=>{
 
   let btn=document.getElementById("addBtn");btn.disabled=true;btn.innerText="⏳ جاري الإضافة وإرسال الإشعار...";
   try{
-    const newDocRef = await addDoc(colRef,{id:type+"-"+Date.now(),title,alternativeTitles,year:parseInt(year),type,category,version:version,genres:selectedGenres,description:desc,poster,banner:banner,status:status,video:video,altUrl:altUrl,episodes:[{title:"الحلقة 1",video,altUrl}],adminKey:"hamza2009",createdAt:serverTimestamp()});
+    const newDocRef = await addDoc(colRef,{id:type+"-"+Date.now(),title,alternativeTitles,year:parseInt(year),type,category,version:version,genres:selectedGenres,description:desc,poster,banner:banner,trailerUrl:trailerUrl,status:status,video:video,altUrl:altUrl,episodes:[{title:"الحلقة 1",video,altUrl}],adminKey:"hamza2009",createdAt:serverTimestamp()});
     try {
       await window.broadcastNotificationToAllDevices({
         title: "تمت إضافة حلقة جديدة!",
@@ -7756,6 +7991,7 @@ window.openEditContentModal = function(fid) {
   const descInput = document.getElementById("editContentDescInput");
   if (descInput) descInput.value = item.description || "";
   const bannerInput = document.getElementById("editContentBannerInput");  if (bannerInput) bannerInput.value = item.banner || item.horizontalPoster || "";
+  const trailerInput = document.getElementById("editContentTrailerInput"); if (trailerInput) trailerInput.value = item.trailerUrl || item.trailer || "";
   const statusSelect = document.getElementById("editContentStatusSelect");  if (statusSelect) statusSelect.value = item.status || (item.category === "فيلم" || item.category === "فلم" ? "مكتمل" : "مستمر");
 
   const statusMsg = document.getElementById("editContentStatusMsg");
@@ -7880,6 +8116,10 @@ window.saveContentFromModal = async function() {
   const newType = (document.getElementById("editContentTypeSelect")?.value || item.type || "anime").trim();
   const newDesc = (document.getElementById("editContentDescInput")?.value || item.description || "بدون وصف").trim();
   const newBanner = (document.getElementById("editContentBannerInput")?.value || item.banner || "").trim();
+  let newTrailer = (document.getElementById("editContentTrailerInput")?.value || item.trailerUrl || item.trailer || "").trim();
+  if (newTrailer && !newTrailer.startsWith("http://") && !newTrailer.startsWith("https://")) {
+    newTrailer = "https://" + newTrailer;
+  }
   const newStatus = (document.getElementById("editContentStatusSelect")?.value || item.status || "مستمر").trim();
   const cleanGenres = [...(window.editModalSelectedGenres || [])];
 
@@ -7902,6 +8142,7 @@ window.saveContentFromModal = async function() {
       type: newType,
       description: newDesc,
       banner: newBanner,
+      trailerUrl: newTrailer,
       status: newStatus,
       adminKey: "hamza2009",
       poster: item.poster || "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=400"
@@ -7916,6 +8157,7 @@ window.saveContentFromModal = async function() {
     item.type = newType;
     item.description = newDesc;
     item.banner = newBanner;
+    item.trailerUrl = newTrailer;
     item.status = newStatus;
 
     if (statusMsg) statusMsg.innerHTML = '<span style="color:#4ade80">✅ تم حفظ جميع التعديلات والتصنيفات بنجاح!</span>';
