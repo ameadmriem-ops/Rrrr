@@ -867,18 +867,58 @@ body.light-mode .home-card-sub {
 .details-panoramic-hero {
   position: relative;
   width: 100%;
-  height: 245px;
-  background: #111;
+  height: clamp(215px, 58vw, 310px);
+  background: #0d0d0d;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-hero-ambient-bg {
+  position: absolute;
+  top: -25px;
+  left: -25px;
+  right: -25px;
+  bottom: -25px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(28px) brightness(0.42);
+  transform: scale(1.15);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.details-hero-ambient-tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.42);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.details-hero-contain-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  padding: 0 4px;
+  box-sizing: border-box;
 }
 
 .details-panoramic-img {
+  max-width: 100%;
+  max-height: 100%;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  filter: brightness(0.82);
+  object-fit: contain;
+  object-position: center;
   display: block;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.75));
 }
 
 .details-hero-overlay-top {
@@ -887,8 +927,8 @@ body.light-mode .home-card-sub {
   left: 0;
   right: 0;
   height: 90px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
-  z-index: 2;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -897,9 +937,9 @@ body.light-mode .home-card-sub {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 140px;
-  background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.85) 50%, transparent 100%);
-  z-index: 2;
+  height: 50px;
+  background: linear-gradient(to top, #0a0a0a 0%, rgba(10,10,10,0.5) 60%, transparent 100%);
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -1006,11 +1046,11 @@ body.page-episodes-active .top-bar {
 
 .details-overlap-container {
   position: relative;
-  margin-top: -65px;
+  margin-top: 14px;
   padding: 0 16px;
   z-index: 6;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 14px;
   direction: rtl;
 }
@@ -1023,8 +1063,8 @@ body.page-episodes-active .top-bar {
   border-radius: 14px;
   overflow: hidden;
   background: #141414;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.7);
   flex-shrink: 0;
 }
 
@@ -1054,10 +1094,10 @@ body.page-episodes-active .top-bar {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   text-align: right;
-  gap: 4px;
-  padding-bottom: 2px;
+  gap: 6px;
+  padding-top: 2px;
 }
 
 .details-main-title {
@@ -1065,7 +1105,7 @@ body.page-episodes-active .top-bar {
   font-weight: 900;
   color: #fff;
   line-height: 1.35;
-  margin: 0 0 5px 0;
+  margin: 0 0 3px 0;
   text-shadow: 0 2px 8px rgba(0,0,0,0.9);
   word-break: break-word;
 }
@@ -1934,8 +1974,12 @@ body.light-mode .episodes-page-wrapper {
   color: #111;
 }
 
+body.light-mode .details-hero-ambient-tint {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 body.light-mode .details-hero-overlay-bottom {
-  background: linear-gradient(to top, #f4f5f8 0%, rgba(244,245,248,0.85) 50%, transparent 100%);
+  background: linear-gradient(to top, #f4f5f8 0%, rgba(244,245,248,0.5) 60%, transparent 100%);
 }
 
 body.light-mode .details-main-title,
@@ -5042,9 +5086,21 @@ window.renderDetailsPage = function(fid) {
   let categoryLabel = window.translateCategoryLabel(item.category, isAnimation);
   let isFav = window.isFavorite ? window.isFavorite(item.id) : false;
 
-  // Banner image (Panoramic horizontal poster, fallback to backdrop or poster)
-  let bannerImg = (item.banner || item.horizontalPoster || item.backdrop || item.poster || "").trim();
+  // Dedicated horizontal poster (Landscape poster)
+  let rawHorizontal = (
+    item.banner ||
+    item.horizontalPoster ||
+    item.landscapePoster ||
+    item.backdrop ||
+    item.widePoster ||
+    item.landscape ||
+    item.coverLandscape ||
+    item.horizontalImage ||
+    ""
+  ).trim();
+
   let posterImg = (item.poster || "").trim();
+  let bannerImg = rawHorizontal || posterImg || "";
   let safeTitle = window.escapeDescHtml(item.title || "بدون عنوان");
   let yearText = item.year || 2024;
 
@@ -5144,9 +5200,15 @@ window.renderDetailsPage = function(fid) {
 
   main.innerHTML = `
     <div class="details-page-wrapper">
-      <!-- 1. Panoramic Header Section -->
+      <!-- 1. Panoramic Header Section (Landscape Poster with full contain & ambient blurred background) -->
       <div class="details-panoramic-hero">
-        <img class="details-panoramic-img" src="${bannerImg}" alt="${safeTitle}" loading="eager" onerror="this.src='${posterImg}'">
+        <div class="details-hero-ambient-bg" style="background-image: url('${bannerImg}');"></div>
+        <div class="details-hero-ambient-tint"></div>
+        
+        <div class="details-hero-contain-frame">
+          <img class="details-panoramic-img" src="${bannerImg}" alt="${safeTitle}" loading="eager" onerror="if(this.src!=='${posterImg}'){this.src='${posterImg}';}">
+        </div>
+
         <div class="details-hero-overlay-top"></div>
         <div class="details-hero-overlay-bottom"></div>
         
@@ -5172,10 +5234,10 @@ window.renderDetailsPage = function(fid) {
         </div>
       </div>
 
-      <!-- 2. Overlapping Poster & Metadata Info -->
+      <!-- 2. Vertical Portrait Poster & Metadata Info (Positioned cleanly below hero without negative overlap) -->
       <div class="details-overlap-container">
         <div class="details-vertical-poster-wrap">
-          <img class="details-vertical-poster" data-poster-fid="${item.firebaseId}" src="${posterImg}" alt="${safeTitle}" loading="eager">
+          <img class="details-vertical-poster" data-poster-fid="${item.firebaseId}" src="${posterImg || bannerImg}" alt="${safeTitle}" loading="eager">
           <span class="details-poster-type-badge">${window.escapeDescHtml(typeLabel)}</span>
         </div>
         <div class="details-header-meta-col">
